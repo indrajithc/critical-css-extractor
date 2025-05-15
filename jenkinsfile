@@ -1,0 +1,40 @@
+pipeline {
+  agent any
+
+  environment {
+    IMAGE_NAME = 'critical-generator-v1'
+    DOCKER_CONFIG = '/tmp/.jenkins-docker' // Avoid permission issues
+  }
+
+  stages {
+     stage('Debug Docker') {
+      steps {
+        sh 'which docker && docker --version'
+      }
+    }
+    
+    stage('Debug') {
+      steps {
+        sh 'pwd && ls -la'
+      }
+    }
+
+    stage('Build Docker Image') {
+      steps {
+        script {
+          docker.build(IMAGE_NAME)
+        }
+      }
+    }
+
+    stage('Run Critical') {
+      steps {
+        script {
+          sh """
+            docker run --rm -v "$PWD":/app -w /app  $IMAGE_NAME  "mkdir -p output && echo 'Running critical...' && critical index.html --inline --base . --width 1300 --height 900  && echo 'Done'"
+          """
+        }
+      }
+    }
+  }
+}
