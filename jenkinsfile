@@ -4,20 +4,11 @@ pipeline {
   environment {
     IMAGE_NAME = 'critical-generator-v1'
     DOCKER_CONFIG = '/tmp/.jenkins-docker' // Avoid permission issues
+    TARGET_URL = 'http://localhost:8000' // Set your target URL here
   }
 
   stages {
-     stage('Debug Docker') {
-      steps {
-        sh 'which docker && docker --version'
-      }
-    }
-    
-    stage('Debug') {
-      steps {
-        sh 'pwd && ls -la'
-      }
-    }
+ 
 
     stage('Build Docker Image') {
       steps {
@@ -27,11 +18,29 @@ pipeline {
       }
     }
 
+    stage('Download HTML') {
+      steps {
+        sh '''
+          echo "Downloading HTML from $TARGET_URL..."
+          curl -L --fail "$TARGET_URL" -o index.html
+          echo "Downloaded index.html:"
+          head -n 10 index.html
+        '''
+      }
+    }
+    
+    stage('Debug Workspace') {
+      steps {
+        sh 'pwd && ls -la'
+      }
+    }
+
     stage('Run Critical') {
       steps {
         script {
           sh """
-            docker run --rm -v "$PWD":/app -w /app  $IMAGE_NAME  "mkdir -p output && echo 'Running critical...' && critical index.html --inline --base . --width 1300 --height 900  && echo 'Done'"
+            pwd && ls -la &&
+            docker run --rm -v "\$PWD":/app -w /app $IMAGE_NAME  "mkdir -p output && echo 'Running critical...' && critical index.html --inline --base . --width 1300 --height 900  && echo 'Done'"
           """
         }
       }
