@@ -40,4 +40,4 @@ ENTRYPOINT ["/bin/sh", "-c"]
 
 # Example command to run critical
 # docker build -t critical-generator .
-# docker run --rm -v "$PWD":/app -w /app critical-generator "mkdir -p output &&  ls -la && echo 'Running critical...' &&  critical index.html --inline --base . --width 1300 --height 900 --output output/index.html && echo 'Done' "
+# docker run --rm -v "$PWD":/app -w /app critical-generator "mkdir -p output &&  ls -la && echo 'Running critical...' &&  critical index.html --inline false --base . --width 1300 --height 900 --target.css critical.css && echo 'Done' "
