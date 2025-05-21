@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { generate } from "critical";
+import "dotenv/config";
 
 const sourceFile = "./index.html";
 
